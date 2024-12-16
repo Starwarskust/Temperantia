@@ -17,22 +17,11 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Temperantia"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Temperantia">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        
-        <activity
-            android:name=".MainMenu"
-            android:theme="@style/Theme.Temperantia">
-        </activity>
-
-        <activity
-            android:name=".EntranceNewExpence"
-            android:theme="@style/Theme.Temperantia">
         </activity>
     </application>
 </manifest>

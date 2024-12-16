@@ -10,7 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 
-class NotificationWorker(context: Context, workerParams: WorkerParameters) :
+class ReminderNotificationWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
 
     override fun doWork(): Result {
@@ -21,14 +21,14 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
         val pendingIntent: PendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val notificationBuilder = NotificationCompat.Builder(applicationContext, "REMINDER_CHANNEL")
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Напоминание")
-            .setContentText("Не забудьте внести расходы за текущий день")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentTitle(applicationContext.getString(R.string.app_name))
+            .setContentText(applicationContext.getString(R.string.notification_message))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
         val notificationManager: NotificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel("REMINDER_CHANNEL", "Usage reminder", NotificationManager.IMPORTANCE_DEFAULT)
+        val channel = NotificationChannel("REMINDER_CHANNEL", "Usage reminder", NotificationManager.IMPORTANCE_HIGH)
         notificationManager.createNotificationChannel(channel)
         notificationManager.notify(1, notificationBuilder.build())
         return Result.success()

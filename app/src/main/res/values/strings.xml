@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Temperantia</string>
+    <string name="notification_message">Не забудьте внести расходы за текущий день</string>
 </resources>
