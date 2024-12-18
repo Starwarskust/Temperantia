@@ -3,12 +3,18 @@ package ru.temperantia.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -17,46 +23,79 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import ru.temperantia.BottomNavigationBar
-import ru.temperantia.TopInfoBar
-import ru.temperantia.data.OperationRecord
+import ru.temperantia.InputNode
+import ru.temperantia.data.AppDatabase
+import ru.temperantia.data.Transaction
+import ru.temperantia.navigation.BottomNavigationBar
+import ru.temperantia.navigation.TopInfoBar
 
 @Composable
-fun TransactionScreen(navHostController: NavHostController, operationList: List<OperationRecord>) {
+fun TransactionScreen(navHostController: NavHostController) {
+    val transactionDao = AppDatabase.instance.transactionDao()
+    val transactionList = transactionDao.getAll()
     Scaffold (
         topBar = { TopInfoBar() },
-        bottomBar = { BottomNavigationBar(navHostController) }
+        bottomBar = { BottomNavigationBar(navHostController) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navHostController.navigate(InputNode) },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null
+                )
+            }
+        }
     ) { innerPadding ->
         Surface (
             color = MaterialTheme.colorScheme.surfaceDim,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
             LazyColumn (
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(12.dp),
+                reverseLayout = true,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
-                    items = operationList,
-                    key = { item -> item.id }
-                ) { operationItem ->
-                    TransactionCard(operationItem.category, operationItem.comment, operationItem.cost)
+                    items = transactionList,
+                    key = { item -> item.id!! }
+                ) { transactionItem ->
+                    TransactionCard(transactionItem)
                 }
             }
         }
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun TransactionCard(category: String,
-                    comment: String,
-                    cost: Float,
+fun TransactionCardPreview() {
+    val previewTransaction = Transaction(
+        id = null,
+        date = 0,
+        account = "Карта",
+        category = "Продукты",
+        subcategory = null,
+        amount = 123.45,
+        comment = "Комментарий"
+    )
+    TransactionCard(previewTransaction)
+}
+
+@Composable
+fun TransactionCard(transaction: Transaction,
                     modifier: Modifier = Modifier) {
     Card (
         modifier = modifier,
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -66,41 +105,31 @@ fun TransactionCard(category: String,
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier.padding(12.dp)
         ) {
-            Text("ic     ", color = Color.White)
+            Icon(
+                imageVector = Icons.Outlined.ShoppingCart,
+                contentDescription = null,
+                tint = Color.Blue
+            )
             Column (
-                modifier = Modifier.weight(0.65f)
+                modifier = Modifier
+                    .weight(0.65f)
+                    .padding(start = 12.dp)
             ) {
-                Text(category)
-                Text(comment)
+                Text(
+                    text = transaction.category,
+                    fontWeight = FontWeight.SemiBold
+                )
+                if (transaction.comment != null)
+                    Text(
+                        text = transaction.comment,
+                        fontSize = 12.sp
+                    )
             }
             Text(
-                text = "$cost ₽",
+                text = "${transaction.amount} ₽",
                 textAlign = TextAlign.End,
                 modifier = Modifier.weight(0.3f)
             )
         }
     }
 }
-
-val purchaseRecords = listOf(
-    OperationRecord(0, "Продукты", "Пятерочка"  , 124.67f),
-    OperationRecord(1, "Продукты", "Магнит"     , 345.17f),
-    OperationRecord(2, "Продукты", "Перекресток", 123.98f),
-    OperationRecord(3, "Развлечения", "ВДНХ"    , 654.67f),
-    OperationRecord(4, "Продукты", "Пятерочка"  , 124.67f),
-    OperationRecord(5, "Продукты", "Магнит"     , 345.17f),
-    OperationRecord(6, "Продукты", "Перекресток", 123.98f),
-    OperationRecord(7, "Развлечения", "ВДНХ"    , 654.67f),
-    OperationRecord(8, "Продукты", "Пятерочка"  , 124.67f),
-    OperationRecord(9, "Продукты", "Магнит"     , 345.17f),
-    OperationRecord(10, "Продукты", "Пятерочка"  , 124.67f),
-    OperationRecord(11, "Продукты", "Магнит"     , 345.17f),
-    OperationRecord(12, "Продукты", "Перекресток", 123.98f),
-    OperationRecord(13, "Развлечения", "ВДНХ"    , 654.67f),
-    OperationRecord(14, "Продукты", "Пятерочка"  , 124.67f),
-    OperationRecord(15, "Продукты", "Магнит"     , 345.17f),
-    OperationRecord(16, "Продукты", "Перекресток", 123.98f),
-    OperationRecord(17, "Развлечения", "ВДНХ"    , 654.67f),
-    OperationRecord(18, "Продукты", "Пятерочка"  , 124.67f),
-    OperationRecord(19, "Продукты", "Магнит"     , 345.17f)
-)

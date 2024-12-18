@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -24,6 +24,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -31,13 +35,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import ru.temperantia.BottomNavigationBar
-import ru.temperantia.TopInfoBar
+import ru.temperantia.InputNode
 import ru.temperantia.data.Category
+import ru.temperantia.navigation.BottomNavigationBar
+import ru.temperantia.navigation.TopInfoBar
 
 @Composable
 fun CategoryScreen(navHostController: NavHostController) {
@@ -47,20 +51,24 @@ fun CategoryScreen(navHostController: NavHostController) {
     ) { innerPadding ->
         Surface (
             color = MaterialTheme.colorScheme.surfaceDim,
-            modifier = Modifier.padding(innerPadding).fillMaxSize()
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
             Column {
-                PieInfo(categories, modifier = Modifier.padding(12.dp).fillMaxWidth())
-                CategoryField(categories, modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp))
+                PieInfo(categoriesRandomScope, navHostController, modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth())
+                CategoryField(categoriesRandomScope, modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp))
             }
         }
     }
 }
 
 @Composable
-fun PieInfo(categoryList: List<Category>, modifier: Modifier = Modifier) {
+fun PieInfo(categoryList: List<Category>, navHostController: NavHostController, modifier: Modifier = Modifier) {
     val sum = categoryList.map { it.totalExpense }.sum()
-//    val mContext = LocalContext.current as Activity
+    var currentSum by remember { mutableFloatStateOf(sum) }
     Card (
         modifier = modifier,
         shape = RoundedCornerShape(10.dp),
@@ -73,7 +81,6 @@ fun PieInfo(categoryList: List<Category>, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
         ) {
-            Text("Декабрь 2024")
             Box (
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -82,7 +89,7 @@ fun PieInfo(categoryList: List<Category>, modifier: Modifier = Modifier) {
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )
                 FloatingActionButton(
-                    onClick = { /* mContext.startActivity(Intent(mContext, EntranceNewExpence::class.java)) */ },
+                    onClick = { navHostController.navigate(InputNode) },
                     shape = CircleShape,
                     containerColor = Color.Yellow,
                     modifier = Modifier.align(alignment = Alignment.BottomEnd)
@@ -93,7 +100,7 @@ fun PieInfo(categoryList: List<Category>, modifier: Modifier = Modifier) {
                     )
                 }
                 Text(
-                    text = "$sum ₽",
+                    text = "$currentSum ₽",
                     fontSize = 20.sp,
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )
@@ -101,6 +108,12 @@ fun PieInfo(categoryList: List<Category>, modifier: Modifier = Modifier) {
         }
     }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun PieChartPreview() {
+//    PieChart(categoriesRandomScope)
+//}
 
 @Composable
 fun PieChart(categoryList: List<Category>, modifier: Modifier = Modifier) {
@@ -135,39 +148,52 @@ fun CategoryField(categoryList: List<Category>, modifier: Modifier = Modifier) {
         val sum = categoryList.map { it.totalExpense }.sum()
         items(
             items = categoryList,
-            key = { item -> item.categoryId }
+            key = { item -> item.id }
         ) { categoryItem ->
             val relativeExpense = categoryItem.totalExpense / sum * 100
-            CategoryCard(categoryItem.categoryName, relativeExpense.toInt(), categoryItem.totalExpense)
+            CategoryCard(categoryItem, relativeExpense.toInt())
         }
     }
 }
 
+//@Preview(showBackground = true)
+//@Composable
+//fun CategoryCardPreview() {
+//    val previewCategory = Category(
+//        id = 0,
+//        name = "Продукты",
+//        totalExpense = 123.45f,
+//        color = Color.Blue
+//    )
+//    CategoryCard(previewCategory, 15)
+//}
+
 @Composable
-fun CategoryCard(
-    categoryName: String,
-    relativeExpense: Int,
-    totalExpense: Float,
-    modifier: Modifier = Modifier
-) {
+fun CategoryCard(category: Category, relativeExpense: Int, modifier: Modifier = Modifier) {
     Card (
         modifier = modifier,
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
         Row (
-            modifier = modifier.padding(12.dp).fillMaxWidth()
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .padding(12.dp)
+                .fillMaxWidth()
         ) {
             Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = null
+                imageVector = Icons.Outlined.Favorite,
+                contentDescription = null,
+                tint = category.color
             )
             Text(
-                text = categoryName,
-                modifier = Modifier.weight(0.65f)
+                text = category.name,
+                modifier = Modifier
+                    .weight(0.65f)
+                    .padding(start = 12.dp)
             )
             Text(
                 text = "$relativeExpense%",
@@ -175,20 +201,13 @@ fun CategoryCard(
                 textAlign = TextAlign.End
             )
             Text(
-                text = "$totalExpense ₽",
+                text = "${category.totalExpense} ₽",
                 modifier = Modifier.weight(0.40f),
                 textAlign = TextAlign.End
             )
         }
     }
 }
-
-val categories = listOf(
-    Category(0, "Продукты", 12345.67f, Color.Yellow),
-    Category(1, "Дом", 3452.17f, Color.Red),
-    Category(2, "Здоровье", 1234.98f, Color.Blue),
-    Category(3, "Развлечения", 6546.67f, Color.Green)
-)
 
 //@Preview(showBackground = true)
 //@Composable
@@ -198,20 +217,15 @@ val categories = listOf(
 //    }
 //}
 
-@Preview(showBackground = true)
-@Composable
-fun PieInfoPreview() {
-    PieInfo(categories)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PieInfoPreview() {
+//    PieInfo(categories)
+//}
 
-@Preview(showBackground = true)
-@Composable
-fun PieChartPreview() {
-    PieChart(categories)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CategoryCardPreview() {
-    CategoryCard("sampleText", 12, 135.76f)
-}
+val categoriesRandomScope = listOf(
+    Category(0, "Продукты", 12345.67f, Color.Yellow),
+    Category(1, "Дом", 3452.17f, Color.Red),
+    Category(2, "Здоровье", 1234.98f, Color.Blue),
+    Category(3, "Развлечения", 6546.67f, Color.Green)
+)

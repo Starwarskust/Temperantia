@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     kotlin("plugin.serialization") version "2.0.21"
+    id("com.google.devtools.ksp")
+    id("androidx.room")
 }
 
 android {
@@ -48,6 +50,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -62,10 +67,13 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
 
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.room.compiler)
+
 //    implementation(libs.kotlinx.serialization.json)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
-    // implementation(libs.androidx.work.runtime.ktx)
+//     implementation(libs.androidx.work.runtime.ktx)
     val workVersion = "2.9.0"
     // val workVersion = "2.10.0"
     implementation("androidx.work:work-runtime-ktx:$workVersion")

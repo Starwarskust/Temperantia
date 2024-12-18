@@ -1,10 +1,5 @@
 package ru.temperantia
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBox
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
@@ -14,49 +9,47 @@ import kotlinx.serialization.Serializable
 import ru.temperantia.screens.AccountScreen
 import ru.temperantia.screens.CategoryScreen
 import ru.temperantia.screens.OverviewScreen
+import ru.temperantia.screens.InputScreen
 import ru.temperantia.screens.TransactionScreen
-import ru.temperantia.screens.purchaseRecords
 import ru.temperantia.ui.theme.TemperantiaTheme
 
 @Composable
 fun TemperantiaApp() {
     val navController = rememberNavController()
     TemperantiaTheme {
-        NavHost(navController = navController, startDestination = CategoryButton) {
-            composable<AccountButton> {
+        NavHost(navController = navController, startDestination = CategoryNode) {
+            composable<AccountNode> {
                 AccountScreen(navController)
             }
-            composable<CategoryButton> {
+            composable<CategoryNode> {
                 CategoryScreen(navController)
             }
-            composable<TransactionButton> {
-                TransactionScreen(navController, purchaseRecords)
+            composable<TransactionNode> {
+                TransactionScreen(navController)
             }
-            composable<OverviewButton> {
+            composable<OverviewNode> {
                 OverviewScreen(navController)
+            }
+            composable<InputNode> {
+                InputScreen(navController)
             }
         }
     }
-
 }
 
 @Serializable
-object AccountButton
+object AccountNode
 
 @Serializable
-object CategoryButton
+object CategoryNode
 
 @Serializable
-object TransactionButton
+object TransactionNode
 
 @Serializable
-object OverviewButton
+object OverviewNode
+
+@Serializable
+object InputNode
 
 data class TopLevelRoute<T : Any>(val name: String, val route: T, val icon: ImageVector)
-
-val topLevelRoutes = listOf(
-    TopLevelRoute("Счета", AccountButton, Icons.Outlined.AccountBox),
-    TopLevelRoute("Категории", CategoryButton, Icons.Outlined.Home),
-    TopLevelRoute("Операции", TransactionButton, Icons.Outlined.ShoppingCart),
-    TopLevelRoute("Обзор", OverviewButton, Icons.Outlined.Info)
-)

@@ -1,4 +1,4 @@
-package ru.temperantia
+package ru.temperantia.navigation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
@@ -21,6 +21,7 @@ fun TopInfoBar() {
         title = {
             Column {
                 Text("12 345.67 ₽")
+                Text("Декабрь 2024")
             }
         },
         navigationIcon = {

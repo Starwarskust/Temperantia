@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Temperantia</string>
     <string name="notification_message">Не забудьте внести расходы за текущий день</string>
+    <string name="accounts">Счета</string>
+    <string name="categories">Категории</string>
+    <string name="transactions">Операции</string>
+    <string name="overview">Обзор</string>
+    <string name="add_transaction">Добавление операции</string>
 </resources>

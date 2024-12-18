@@ -9,8 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import ru.temperantia.BottomNavigationBar
-import ru.temperantia.TopInfoBar
+import ru.temperantia.navigation.BottomNavigationBar
+import ru.temperantia.navigation.TopInfoBar
 
 @Composable
 fun OverviewScreen(navHostController: NavHostController) {
@@ -19,8 +19,10 @@ fun OverviewScreen(navHostController: NavHostController) {
         bottomBar = { BottomNavigationBar(navHostController) }
     ) { innerPadding ->
         Surface (
-            color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.padding(innerPadding).fillMaxSize()
+            color = MaterialTheme.colorScheme.surfaceDim,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
             Text("OverviewScreen")
         }
