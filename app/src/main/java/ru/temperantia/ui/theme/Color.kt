@@ -14,3 +14,4 @@ val DeepDarkGreen = Color(0xFF1a1e03)
 val GreyDarkGreen = Color(0xFF31322a)
 
 val SoftGreen = Color(0xFF4cb44f)
+val yellowButton = Color(0xFFffd930)

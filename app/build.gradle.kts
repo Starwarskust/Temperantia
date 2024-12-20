@@ -78,6 +78,8 @@ dependencies {
     // val workVersion = "2.10.0"
     implementation("androidx.work:work-runtime-ktx:$workVersion")
 
+    implementation(libs.androidx.material.icons.extended)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

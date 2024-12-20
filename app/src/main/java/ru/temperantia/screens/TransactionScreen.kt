@@ -13,13 +13,17 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,42 +37,51 @@ import ru.temperantia.InputNode
 import ru.temperantia.data.AppDatabase
 import ru.temperantia.data.Transaction
 import ru.temperantia.navigation.BottomNavigationBar
+import ru.temperantia.navigation.MenuDrawer
 import ru.temperantia.navigation.TopInfoBar
+import ru.temperantia.ui.theme.yellowButton
 
 @Composable
 fun TransactionScreen(navHostController: NavHostController) {
     val transactionDao = AppDatabase.instance.transactionDao()
     val transactionList = transactionDao.getAll()
-    Scaffold (
-        topBar = { TopInfoBar() },
-        bottomBar = { BottomNavigationBar(navHostController) },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navHostController.navigate(InputNode) },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null
-                )
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = { MenuDrawer() },
+    ) {
+        Scaffold (
+        topBar = { TopInfoBar(scope, drawerState) },
+            bottomBar = { BottomNavigationBar(navHostController) },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { navHostController.navigate(InputNode) },
+                    containerColor = yellowButton
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null
+                    )
+                }
             }
-        }
-    ) { innerPadding ->
-        Surface (
-            color = MaterialTheme.colorScheme.surfaceDim,
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            LazyColumn (
-                modifier = Modifier.padding(12.dp),
-                reverseLayout = true,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) { innerPadding ->
+            Surface (
+                color = MaterialTheme.colorScheme.surfaceDim,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
             ) {
-                items(
-                    items = transactionList,
-                    key = { item -> item.id!! }
-                ) { transactionItem ->
-                    TransactionCard(transactionItem)
+                LazyColumn (
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = transactionList.reversed(),
+                        key = { item -> item.id!! }
+                    ) { transactionItem ->
+                        TransactionCard(transactionItem)
+                    }
                 }
             }
         }

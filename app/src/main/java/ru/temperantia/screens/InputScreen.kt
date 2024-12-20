@@ -34,6 +34,7 @@ import ru.temperantia.R
 import ru.temperantia.data.AppDatabase
 import ru.temperantia.data.Transaction
 import ru.temperantia.ui.theme.SoftGreen
+import ru.temperantia.ui.theme.yellowButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +80,8 @@ fun InputScreen(navHostController: NavHostController) {
                         transactionDao.insert(inputTransaction)
                     }
                     navHostController.navigateUp()
-                }
+                },
+                containerColor = yellowButton
             ) {
                 Text("Add")
             }

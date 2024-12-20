@@ -6,4 +6,6 @@
     <string name="transactions">Операции</string>
     <string name="overview">Обзор</string>
     <string name="add_transaction">Добавление операции</string>
+    <string name="settings">Настройки</string>
+    <string name="about">О приложении</string>
 </resources>
