@@ -1,6 +1,7 @@
 package ru.temperantia.navigation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -22,7 +23,7 @@ import ru.temperantia.ui.theme.SoftGreen
 fun TopInfoBar(
     scope: CoroutineScope,
     drawerState: DrawerState,
-//    contentActions: @Composable() (RowScope.() -> Unit)
+    contentActions: @Composable() (RowScope.() -> Unit) = {}
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -46,16 +47,7 @@ fun TopInfoBar(
                 )
             }
         },
-//        actions = contentActions,
-        actions = {
-            IconButton(onClick = { /* do something */ }) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-            }
-        },
+        actions = contentActions,
         colors = topAppBarColors(
             containerColor = SoftGreen,
             titleContentColor = Color.White

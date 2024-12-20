@@ -8,4 +8,11 @@
     <string name="add_transaction">Добавление операции</string>
     <string name="settings">Настройки</string>
     <string name="about">О приложении</string>
+    <string name="add">Добавить</string>
+    <string name="today">сегодня</string>
+    <string name="yesterday">вчера</string>
+    <string name="last">последняя</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="selected">последняя</string>
 </resources>

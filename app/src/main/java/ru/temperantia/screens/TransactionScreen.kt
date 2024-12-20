@@ -10,12 +10,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -40,6 +42,8 @@ import ru.temperantia.navigation.BottomNavigationBar
 import ru.temperantia.navigation.MenuDrawer
 import ru.temperantia.navigation.TopInfoBar
 import ru.temperantia.ui.theme.yellowButton
+import java.text.DateFormat
+import java.util.Date
 
 @Composable
 fun TransactionScreen(navHostController: NavHostController) {
@@ -52,7 +56,17 @@ fun TransactionScreen(navHostController: NavHostController) {
         drawerContent = { MenuDrawer() },
     ) {
         Scaffold (
-        topBar = { TopInfoBar(scope, drawerState) },
+            topBar = {
+                TopInfoBar(scope, drawerState) {
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                }
+            },
             bottomBar = { BottomNavigationBar(navHostController) },
             floatingActionButton = {
                 FloatingActionButton(
@@ -80,7 +94,7 @@ fun TransactionScreen(navHostController: NavHostController) {
                         items = transactionList.reversed(),
                         key = { item -> item.id!! }
                     ) { transactionItem ->
-                        TransactionCard(transactionItem)
+                        TransactionBlock(transactionItem)
                     }
                 }
             }
@@ -93,19 +107,24 @@ fun TransactionScreen(navHostController: NavHostController) {
 fun TransactionCardPreview() {
     val previewTransaction = Transaction(
         id = null,
-        date = 0,
+        date = Date(),
         account = "Карта",
         category = "Продукты",
         subcategory = null,
         amount = 123.45,
         comment = "Комментарий"
     )
-    TransactionCard(previewTransaction)
+    TransactionBlock(previewTransaction)
 }
 
 @Composable
-fun TransactionCard(transaction: Transaction,
-                    modifier: Modifier = Modifier) {
+fun TransactionBlock(transaction: Transaction,
+                     modifier: Modifier = Modifier) {
+    val okda = DateFormat.getDateInstance().format(transaction.date)
+    Text(
+        text = okda,
+        fontWeight = FontWeight.SemiBold
+    )
     Card (
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
@@ -135,7 +154,7 @@ fun TransactionCard(transaction: Transaction,
                 if (transaction.comment != null)
                     Text(
                         text = transaction.comment,
-                        fontSize = 12.sp
+                        fontSize = 14.sp
                     )
             }
             Text(

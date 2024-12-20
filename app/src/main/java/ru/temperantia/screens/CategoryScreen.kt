@@ -13,12 +13,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -46,6 +48,7 @@ import ru.temperantia.data.Category
 import ru.temperantia.navigation.BottomNavigationBar
 import ru.temperantia.navigation.MenuDrawer
 import ru.temperantia.navigation.TopInfoBar
+import ru.temperantia.ui.theme.SoftGreen
 import ru.temperantia.ui.theme.yellowButton
 
 @Composable
@@ -57,7 +60,17 @@ fun CategoryScreen(navHostController: NavHostController) {
         drawerContent = { MenuDrawer() },
     ) {
         Scaffold (
-            topBar = { TopInfoBar(scope, drawerState) },
+            topBar = {
+                TopInfoBar(scope, drawerState) {
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                }
+            },
             bottomBar = { BottomNavigationBar(navHostController) }
         ) { innerPadding ->
             Surface (
@@ -235,8 +248,8 @@ fun CategoryCard(category: Category, relativeExpense: Int, modifier: Modifier = 
 //}
 
 val categoriesRandomScope = listOf(
-    Category(0, "Продукты", 12345.67f, Color.Yellow),
-    Category(1, "Дом", 3452.17f, Color.Red),
-    Category(2, "Здоровье", 1234.98f, Color.Blue),
-    Category(3, "Развлечения", 6546.67f, Color.Green)
+    Category(0, "Продукты", 12345.67f, Color(0xFFfed766)),
+    Category(1, "Дом", 3452.17f, Color(0xFFfe4a49)),
+    Category(2, "Здоровье", 1234.98f, Color(0xFF2ab7ca)),
+    Category(3, "Развлечения", 6546.67f, SoftGreen)
 )
