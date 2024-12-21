@@ -137,7 +137,7 @@ fun InputScreen(navHostController: NavHostController) {
                     value = if (inputComment != null) inputComment!! else "",
                     onValueChange = { inputComment = it },
                     label = { Text("Комментарий") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                 )
 
                 // TODO remove TEMPORAL BUTTONS
