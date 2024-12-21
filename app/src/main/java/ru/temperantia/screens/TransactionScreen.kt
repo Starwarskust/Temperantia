@@ -140,7 +140,7 @@ fun TransactionBlock(transaction: Transaction,
             Icon(
                 imageVector = Icons.Outlined.ShoppingCart,
                 contentDescription = null,
-                tint = Color.Blue
+                tint = categoryColorMap[transaction.category]!!
             )
             Column (
                 modifier = Modifier

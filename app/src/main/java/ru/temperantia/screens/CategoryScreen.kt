@@ -60,9 +60,6 @@ fun CategoryScreen(navHostController: NavHostController) {
     val mapTransCategory = transactionList.groupBy { it.category }
     var categoryListMap = listOf<CategoryIcon>()
     var i = 0
-    val categoryNamesList = listOf("Продукты", "Дом", "Здоровье", "Отдых")
-    val colorList = listOf(Color(0xFFfed766), Color(0xFFfe4a49), Color(0xFF2ab7ca), SoftGreen)
-    val categoryColorMap = categoryNamesList.zip(colorList).toMap()
     mapTransCategory.forEach { itOut ->
         categoryListMap = categoryListMap + CategoryIcon(
             i,
@@ -263,3 +260,7 @@ fun CategoryCard(category: CategoryIcon, relativeExpense: Int, modifier: Modifie
 //fun PieInfoPreview() {
 //    PieInfo(categories)
 //}
+
+val categoryNamesList = listOf("Продукты", "Дом", "Здоровье", "Отдых")
+val colorList = listOf(Color(0xFFfed766), Color(0xFFfe4a49), Color(0xFF2ab7ca), SoftGreen)
+val categoryColorMap = categoryNamesList.zip(colorList).toMap()

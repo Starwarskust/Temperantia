@@ -173,27 +173,28 @@ fun InputScreen(navHostController: NavHostController) {
 @Composable
 fun CategorySelectionPanel(onCategorySelected: (String) -> Unit) {
 
-    // TODO get this list from database
-    val categoryNamesList = listOf("Продукты", "Дом", "Здоровье", "Отдых")
-    val colorList = listOf(Color(0xFFfed766), Color(0xFFfe4a49), Color(0xFF2ab7ca), SoftGreen)
+    // TODO get category list from database
     var selectedIndex by remember { mutableIntStateOf(0) }
 
-    Row (
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        categoryNamesList.forEachIndexed { index, s ->
-            FilterChip(
-                onClick = {
-                    selectedIndex = index
-                    onCategorySelected(s)
-                },
-                label = {
-                    Text(s, fontSize = 16.sp)
-                },
-                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = colorList[index]),
-                selected = (selectedIndex == index)
-            )
+    Column {
+        Text("Категории", fontSize = 12.sp)
+        Row (
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            categoryNamesList.forEachIndexed { index, s ->
+                FilterChip(
+                    onClick = {
+                        selectedIndex = index
+                        onCategorySelected(s)
+                    },
+                    label = {
+                        Text(s, fontSize = 16.sp)
+                    },
+                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = categoryColorMap[s]!!),
+                    selected = (selectedIndex == index)
+                )
+            }
         }
     }
 }
@@ -360,5 +361,5 @@ val randomScope = listOf(
     Transaction(null, Date(2024 - 1900, 11, 16), "Карта", "Дом",      "Подкатегория", 345.17, null),
     Transaction(null, Date(2024 - 1900, 11, 16), "Карта", "Продукты", "Подкатегория", 1023.0,   "Перекресток"),
     Transaction(null, Date(2024 - 1900, 11, 18), "Карта", "Здоровье", null,           350.10, "Горздрав"),
-    Transaction(null, Date(2024 - 1900, 11, 19), "Карта", "Продукты", "Подкатегория", 345.17, null)
+    Transaction(null, Date(2024 - 1900, 11, 19), "Карта", "Отдых",    "Подкатегория", 345.17, null)
 )
