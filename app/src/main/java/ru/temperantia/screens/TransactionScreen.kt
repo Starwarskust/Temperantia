@@ -1,5 +1,6 @@
 package ru.temperantia.screens
 
+import android.icu.text.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +43,6 @@ import ru.temperantia.navigation.BottomNavigationBar
 import ru.temperantia.navigation.MenuDrawer
 import ru.temperantia.navigation.TopInfoBar
 import ru.temperantia.ui.theme.yellowButton
-import java.text.DateFormat
 import java.util.Date
 
 @Composable
@@ -91,7 +91,7 @@ fun TransactionScreen(navHostController: NavHostController) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(
-                        items = transactionList.reversed(),
+                        items = transactionList.sortedByDescending { it.date },
                         key = { item -> item.id!! }
                     ) { transactionItem ->
                         TransactionBlock(transactionItem)
@@ -120,9 +120,9 @@ fun TransactionCardPreview() {
 @Composable
 fun TransactionBlock(transaction: Transaction,
                      modifier: Modifier = Modifier) {
-    val okda = DateFormat.getDateInstance().format(transaction.date)
+    val df = DateFormat.getDateInstance(DateFormat.LONG)
     Text(
-        text = okda,
+        text = df.format(transaction.date),
         fontWeight = FontWeight.SemiBold
     )
     Card (

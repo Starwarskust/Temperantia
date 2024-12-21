@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import ru.temperantia.MyApplication
 import ru.temperantia.R
@@ -58,7 +59,9 @@ import java.util.Date
 fun InputScreen(navHostController: NavHostController) {
     val transactionDao = AppDatabase.instance.transactionDao()
     var inputValue by remember { mutableStateOf("0") }
+    var inputCategory by remember { mutableStateOf("Продукты") }
     var inputDate by remember { mutableStateOf(Date()) }
+    var inputComment by remember { mutableStateOf<String?>(null) }
     val transactionList = transactionDao.getAll()
     var n by remember { mutableIntStateOf(transactionList.size) }
 
@@ -91,12 +94,12 @@ fun InputScreen(navHostController: NavHostController) {
                     if (inputAmount > 0) {
                         val inputTransaction = Transaction(
                             id = null,
-                            date = Date(),
+                            date = inputDate,
                             account = "Карта",
-                            category = "Продукты",
+                            category = inputCategory,
                             subcategory = null,
                             amount = inputValue.toDouble(),
-                            comment = null)
+                            comment = inputComment)
                         transactionDao.insert(inputTransaction)
                     }
                     navHostController.navigateUp()
@@ -115,19 +118,29 @@ fun InputScreen(navHostController: NavHostController) {
         ) {
             Column (
                 modifier = Modifier.padding(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(40.dp)
             ) {
                 OutlinedTextField(
                     value = inputValue,
                     onValueChange = { inputValue = it },
                     label = { Text("Введите сумму") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
+                CategorySelectionPanel {
+                    inputCategory = it
+                }
                 DateSelectionPanel(lastTransactionDate) {
                     inputDate = it
                 }
+                OutlinedTextField(
+                    value = if (inputComment != null) inputComment!! else "",
+                    onValueChange = { inputComment = it },
+                    label = { Text("Комментарий") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
 
-                // TEMPORAL BUTTONS
+                // TODO remove TEMPORAL BUTTONS
                 OutlinedButton(
                     onClick = {
                         transactionDao.insertAll(randomScope)
@@ -145,15 +158,42 @@ fun InputScreen(navHostController: NavHostController) {
                     Text("Clean database")
                 }
                 Text("Now DB has $n records")
-                Text("Date:")
-                val okda = DateFormat.getPatternInstance(DateFormat.NUM_MONTH_DAY).format(inputDate)
+                val datePicked = DateFormat.getPatternInstance(DateFormat.NUM_MONTH_DAY).format(inputDate)
                 Text(
-                    text = okda,
+                    text = "Date: $datePicked",
                     fontWeight = FontWeight.SemiBold
                 )
                 // TEMPORAL BUTTONS
 
             }
+        }
+    }
+}
+
+@Composable
+fun CategorySelectionPanel(onCategorySelected: (String) -> Unit) {
+
+    // TODO get this list from database
+    val categoryNamesList = listOf("Продукты", "Дом", "Здоровье", "Отдых")
+    val colorList = listOf(Color(0xFFfed766), Color(0xFFfe4a49), Color(0xFF2ab7ca), SoftGreen)
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
+    Row (
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        categoryNamesList.forEachIndexed { index, s ->
+            FilterChip(
+                onClick = {
+                    selectedIndex = index
+                    onCategorySelected(s)
+                },
+                label = {
+                    Text(s, fontSize = 16.sp)
+                },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = colorList[index]),
+                selected = (selectedIndex == index)
+            )
         }
     }
 }

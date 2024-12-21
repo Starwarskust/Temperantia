@@ -1,6 +1,7 @@
 package ru.temperantia.data
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
@@ -18,20 +19,25 @@ data class Transaction(
     val comment: String?
 )
 
-//data class Account(
-//    val id: Int,
-//    val date: Date,
-//    val account: String,
-//    val category: String,
-//    val subcategory: String,
-//    val amount: Float,
-//    val comment: String
+//@Entity(tableName = "categories")
+//data class Category(
+//    @PrimaryKey(autoGenerate = true)
+//    val id: Int?,
+//    val name: String
 //)
 
-data class Category(
+//@Entity(tableName = "accounts")
+//data class Account(
+//    val id: Int,
+//    val name: String,
+//    val date: Date
+//)
+
+data class CategoryIcon(
     val id: Int,
     val name: String,
-    val totalExpense: Float,
+    val totalExpense: Double,
+    val icon: ImageVector,
     val color: Color
 )
 

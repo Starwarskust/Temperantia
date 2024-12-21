@@ -49,7 +49,6 @@ fun MenuDrawer() {
                 label = { Text(stringResource(R.string.settings)) },
                 selected = false,
                 icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                badge = { Text("20") }, // Placeholder
                 onClick = { /* Handle click */ }
             )
             NavigationDrawerItem(

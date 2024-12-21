@@ -15,4 +15,5 @@
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
     <string name="selected">последняя</string>
+    <string name="all_accounts">Все счета</string>
 </resources>
