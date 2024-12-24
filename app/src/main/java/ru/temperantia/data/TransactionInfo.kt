@@ -19,12 +19,12 @@ data class Transaction(
     val comment: String?
 )
 
-//@Entity(tableName = "categories")
-//data class Category(
-//    @PrimaryKey(autoGenerate = true)
-//    val id: Int?,
-//    val name: String
-//)
+@Entity(tableName = "categories")
+data class Category(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int?,
+    val name: String
+)
 
 //@Entity(tableName = "accounts")
 //data class Account(
