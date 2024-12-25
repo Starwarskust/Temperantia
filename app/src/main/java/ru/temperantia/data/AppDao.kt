@@ -23,3 +23,30 @@ interface TransactionDao {
     @Query("DELETE FROM transactions")
     fun deleteAll()
 }
+
+@Dao
+interface CategoryDao {
+    @Query("SELECT * FROM categories")
+    fun getAll(): List<Category>
+
+    @Query("SELECT * FROM categories WHERE id = :id")
+    fun getById(id: Int): Category
+
+    @Query(
+        "SELECT * FROM categories " +
+        "JOIN transactions ON categories.id = transactions.category_id"
+    )
+    fun loadCategoryAndTransactionList(): Map<Category, List<Transaction>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(category: Category)
+
+    @Insert
+    fun insertAll(categories: List<Category>)
+
+    @Delete
+    fun delete(category: Category)
+
+    @Query("DELETE FROM categories")
+    fun deleteAll()
+}

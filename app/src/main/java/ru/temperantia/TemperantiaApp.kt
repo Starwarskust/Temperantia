@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import ru.temperantia.screens.AccountScreen
+import ru.temperantia.screens.CategoryEditScreen
 import ru.temperantia.screens.CategoryScreen
 import ru.temperantia.screens.OverviewScreen
 import ru.temperantia.screens.InputScreen
@@ -33,6 +34,9 @@ fun TemperantiaApp() {
             composable<InputNode> {
                 InputScreen(navController)
             }
+            composable<CategoryEditNode> {
+                CategoryEditScreen(navController)
+            }
         }
     }
 }
@@ -51,5 +55,8 @@ object OverviewNode
 
 @Serializable
 object InputNode
+
+@Serializable
+object CategoryEditNode
 
 data class TopLevelRoute<T : Any>(val name: String, val route: T, val icon: ImageVector)

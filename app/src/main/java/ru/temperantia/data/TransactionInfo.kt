@@ -1,7 +1,10 @@
 package ru.temperantia.data
 
+import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
@@ -13,7 +16,8 @@ data class Transaction(
     val id: Int?,
     val date: Date,
     val account: String,
-    val category: String,
+    @ColumnInfo(name = "category_id")
+    val categoryId: Int,
     val subcategory: String?,
     val amount: Double,
     val comment: String?
@@ -23,32 +27,49 @@ data class Transaction(
 data class Category(
     @PrimaryKey(autoGenerate = true)
     val id: Int?,
-    val name: String
-)
-
-//@Entity(tableName = "accounts")
-//data class Account(
-//    val id: Int,
-//    val name: String,
-//    val date: Date
-//)
-
-data class CategoryIcon(
-    val id: Int,
     val name: String,
-    val totalExpense: Double,
     val icon: ImageVector,
     val color: Color
 )
 
+@Entity(tableName = "accounts")
+data class Account(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int?,
+    val name: String,
+    val balance: Double
+)
+
 class Converters {
     @TypeConverter
-    fun fromTimestamp(value: Long?): Date? {
-        return value?.let { Date(it) }
+    fun fromTimestamp(value: Long): Date {
+        return Date(value)
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
+    fun dateToTimestamp(date: Date): Long {
+        return date.time
+    }
+
+    @TypeConverter
+    fun intToColor(value: Int) : Color {
+        return Color(value)
+    }
+
+    @TypeConverter
+    fun colorToInt(color: Color) : Int {
+        return color.toArgb()
+    }
+
+    @TypeConverter
+    fun iconByName(name: String): ImageVector {
+        val cl = Class.forName("androidx.compose.material.icons.outlined.${name}Kt")
+        val method = cl.declaredMethods.first()
+        return method.invoke(null, Icons.Outlined) as ImageVector
+    }
+
+    @TypeConverter
+    fun getIconName(icon: ImageVector): String {
+        return icon.name.split(".")[1]
     }
 }

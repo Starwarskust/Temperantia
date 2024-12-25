@@ -59,7 +59,7 @@ import java.util.Date
 fun InputScreen(navHostController: NavHostController) {
     val transactionDao = AppDatabase.instance.transactionDao()
     var inputValue by remember { mutableStateOf("0") }
-    var inputCategory by remember { mutableStateOf("Продукты") }
+    var inputCategory by remember { mutableStateOf<Int?>(null) }
     var inputDate by remember { mutableStateOf(Date()) }
     var inputComment by remember { mutableStateOf<String?>(null) }
     val transactionList = transactionDao.getAll()
@@ -91,12 +91,12 @@ fun InputScreen(navHostController: NavHostController) {
             ExtendedFloatingActionButton(
                 onClick = {
                     val inputAmount = inputValue.toDouble()
-                    if (inputAmount > 0) {
+                    if (inputAmount > 0 && inputCategory != null) {
                         val inputTransaction = Transaction(
                             id = null,
                             date = inputDate,
                             account = "Карта",
-                            category = inputCategory,
+                            categoryId = inputCategory!!,
                             subcategory = null,
                             amount = inputValue.toDouble(),
                             comment = inputComment)
@@ -143,11 +143,11 @@ fun InputScreen(navHostController: NavHostController) {
                 // TODO remove TEMPORAL BUTTONS
                 OutlinedButton(
                     onClick = {
-                        transactionDao.insertAll(randomScope)
-                        n += randomScope.size
+                        transactionDao.insertAll(transactionPresetScope)
+                        n += transactionPresetScope.size
                     }
                 ) {
-                    Text("Push ${randomScope.size} transactions")
+                    Text("Push ${transactionPresetScope.size} transactions")
                 }
                 OutlinedButton(
                     onClick = {
@@ -171,28 +171,27 @@ fun InputScreen(navHostController: NavHostController) {
 }
 
 @Composable
-fun CategorySelectionPanel(onCategorySelected: (String) -> Unit) {
-
-    // TODO get category list from database
+fun CategorySelectionPanel(onCategorySelected: (Int) -> Unit) {
+    val categoryDao = AppDatabase.instance.categoryDao()
+    val categoryList = categoryDao.getAll()
     var selectedIndex by remember { mutableIntStateOf(0) }
-
     Column {
         Text("Категории", fontSize = 12.sp)
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            categoryNamesList.forEachIndexed { index, s ->
+            categoryList.forEach { category ->
                 FilterChip(
                     onClick = {
-                        selectedIndex = index
-                        onCategorySelected(s)
+                        selectedIndex = category.id!!
+                        onCategorySelected(category.id)
                     },
                     label = {
-                        Text(s, fontSize = 16.sp)
+                        Text(category.name, fontSize = 16.sp)
                     },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = categoryColorMap[s]!!),
-                    selected = (selectedIndex == index)
+                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = category.color),
+                    selected = (selectedIndex == category.id)
                 )
             }
         }
@@ -210,7 +209,7 @@ fun DateSelectionPanel(lastTransactionDate: Date, onDateSelected: (Date) -> Unit
     val yesterday = calendar.time
 
     var thirdChipDate by remember { mutableStateOf(lastTransactionDate) }
-    var thirdChipText by remember { mutableStateOf(MyApplication.appContext.getString(R.string.last)) }
+    var thirdChipText by remember { mutableStateOf(MyApplication.appContext.getString(R.string.date_last)) }
 
     var selectedDate by remember { mutableStateOf(Date()) }
 
@@ -237,7 +236,7 @@ fun DateSelectionPanel(lastTransactionDate: Date, onDateSelected: (Date) -> Unit
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(df.format(today))
-                    Text(stringResource(R.string.today))
+                    Text(stringResource(R.string.date_today))
                 }
             },
             colors = FilterChipDefaults.filterChipColors(selectedContainerColor = SoftGreen),
@@ -260,7 +259,7 @@ fun DateSelectionPanel(lastTransactionDate: Date, onDateSelected: (Date) -> Unit
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(df.format(yesterday))
-                    Text(stringResource(R.string.yesterday))
+                    Text(stringResource(R.string.date_yesterday))
                 }
             },
             colors = FilterChipDefaults.filterChipColors(selectedContainerColor = SoftGreen),
@@ -306,7 +305,7 @@ fun DateSelectionPanel(lastTransactionDate: Date, onDateSelected: (Date) -> Unit
                                 yesterdayIsSelected = false
                                 thirdChipIsSelected = true
                                 thirdChipDate = selectedDate
-                                thirdChipText = MyApplication.appContext.getString(R.string.selected)
+                                thirdChipText = MyApplication.appContext.getString(R.string.date_selected)
                             }
                             selectedDate == yesterday -> {
                                 todayIsSelected = false
@@ -356,10 +355,11 @@ fun DatePickerModal(
     }
 }
 
-val randomScope = listOf(
-    Transaction(null, Date(2024 - 1900, 11, 15), "Карта", "Продукты", "Подкатегория", 124.67, "Пятерочка"),
-    Transaction(null, Date(2024 - 1900, 11, 16), "Карта", "Дом",      "Подкатегория", 345.17, null),
-    Transaction(null, Date(2024 - 1900, 11, 16), "Карта", "Продукты", "Подкатегория", 1023.0,   "Перекресток"),
-    Transaction(null, Date(2024 - 1900, 11, 18), "Карта", "Здоровье", null,           350.10, "Горздрав"),
-    Transaction(null, Date(2024 - 1900, 11, 19), "Карта", "Отдых",    "Подкатегория", 345.17, null)
+// TODO this transactionPresetScope may crush app due to categoryId
+val transactionPresetScope = listOf(
+    Transaction(null, Date(2024 - 1900, 11, 15), "Карта", 4, "Подкатегория", 124.67, "Пятерочка"),
+    Transaction(null, Date(2024 - 1900, 11, 16), "Карта", 1,      "Подкатегория", 345.17, null),
+    Transaction(null, Date(2024 - 1900, 11, 16), "Карта", 4, "Подкатегория", 1023.0,   "Перекресток"),
+    Transaction(null, Date(2024 - 1900, 11, 18), "Карта", 2, null,           350.10, "Горздрав"),
+    Transaction(null, Date(2024 - 1900, 11, 19), "Карта", 3,    "Подкатегория", 345.17, null)
 )

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -39,37 +40,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import ru.temperantia.CategoryEditNode
 import ru.temperantia.InputNode
 import ru.temperantia.data.AppDatabase
-import ru.temperantia.data.CategoryIcon
+import ru.temperantia.data.Category
+import ru.temperantia.data.Transaction
 import ru.temperantia.navigation.BottomNavigationBar
 import ru.temperantia.navigation.MenuDrawer
 import ru.temperantia.navigation.TopInfoBar
-import ru.temperantia.ui.theme.SoftGreen
 import ru.temperantia.ui.theme.yellowButton
 
 @Composable
 fun CategoryScreen(navHostController: NavHostController) {
-
-    // TODO get info about category from database in future
-    val transactionDao = AppDatabase.instance.transactionDao()
-    val transactionList = transactionDao.getAll()
-    val mapTransCategory = transactionList.groupBy { it.category }
-    var categoryListMap = listOf<CategoryIcon>()
-    var i = 0
-    mapTransCategory.forEach { itOut ->
-        categoryListMap = categoryListMap + CategoryIcon(
-            i,
-            itOut.key,
-            itOut.value.sumOf { it.amount },
-            Icons.Outlined.ShoppingCart,
-            categoryColorMap[itOut.key]!!)
-        i++
-    }
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     ModalNavigationDrawer(
@@ -79,7 +65,7 @@ fun CategoryScreen(navHostController: NavHostController) {
         Scaffold (
             topBar = {
                 TopInfoBar(scope, drawerState) {
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = { navHostController.navigate(CategoryEditNode) }) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
                             contentDescription = null,
@@ -97,10 +83,10 @@ fun CategoryScreen(navHostController: NavHostController) {
                     .fillMaxSize()
             ) {
                 Column {
-                    PieInfo(categoryListMap, navHostController, modifier = Modifier
+                    PieInfo(navHostController, modifier = Modifier
                         .padding(12.dp)
                         .fillMaxWidth())
-                    CategoryField(categoryListMap, modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp))
+                    CategoryField(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp))
                 }
             }
         }
@@ -108,10 +94,11 @@ fun CategoryScreen(navHostController: NavHostController) {
 }
 
 @Composable
-fun PieInfo(categoryList: List<CategoryIcon>, navHostController: NavHostController, modifier: Modifier = Modifier) {
+fun PieInfo(navHostController: NavHostController, modifier: Modifier = Modifier) {
+    val categoryMap = AppDatabase.instance.categoryDao().loadCategoryAndTransactionList()
     // TODO take startMoney from account in future
     val startMoney = 20000
-    val sum = categoryList.sumOf { it.totalExpense }
+    val sum = categoryMap.flatMap { it.value }.sumOf { it.amount }
     val currentSum by remember { mutableDoubleStateOf(sum) }
     val currentMoney = startMoney - currentSum
     Card (
@@ -130,7 +117,7 @@ fun PieInfo(categoryList: List<CategoryIcon>, navHostController: NavHostControll
                 modifier = Modifier.fillMaxWidth()
             ) {
                 PieChart(
-                    categoryList = categoryList,
+                    categoryMap = categoryMap,
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )
                 FloatingActionButton(
@@ -154,18 +141,18 @@ fun PieInfo(categoryList: List<CategoryIcon>, navHostController: NavHostControll
 }
 
 @Composable
-fun PieChart(categoryList: List<CategoryIcon>, modifier: Modifier = Modifier) {
-    val sum = categoryList.sumOf { it.totalExpense }
+fun PieChart(categoryMap: Map<Category, List<Transaction>>, modifier: Modifier = Modifier) {
+    val sum = categoryMap.flatMap { it.value }.sumOf { it.amount }
     Box(modifier = modifier
         .size(250.dp)
         .padding(35.dp)
         .drawBehind {
             var startAngle = -90f
             var sweepAngle: Float
-            categoryList.forEach { categoryItem ->
-                sweepAngle = (categoryItem.totalExpense / sum * 360).toFloat()
+            categoryMap.forEach { (category, transactionList) ->
+                sweepAngle = (transactionList.sumOf { it.amount } / sum * 360).toFloat()
                 drawArc(
-                    color = categoryItem.color,
+                    color = category.color,
                     startAngle = startAngle,
                     sweepAngle = sweepAngle,
                     useCenter = false,
@@ -178,36 +165,38 @@ fun PieChart(categoryList: List<CategoryIcon>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CategoryField(categoryList: List<CategoryIcon>, modifier: Modifier = Modifier) {
+fun CategoryField(modifier: Modifier = Modifier) {
+    val categoryMap = AppDatabase.instance.categoryDao().loadCategoryAndTransactionList()
+    val sum = categoryMap.flatMap { it.value }.sumOf { it.amount }
     LazyColumn (
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
-        val sum = categoryList.sumOf { it.totalExpense }
         items(
-            items = categoryList,
-            key = { item -> item.id }
-        ) { categoryItem ->
-            val relativeExpense = categoryItem.totalExpense / sum * 100
-            CategoryCard(categoryItem, relativeExpense.toInt())
+            items = categoryMap.toList(),
+            key = { item -> item.first.id!! }
+        ) { item ->
+            val totalExpense = item.second.sumOf { it.amount }
+            val relativeExpense = totalExpense / sum * 100
+            CategoryCard(item.first, relativeExpense.toInt(), totalExpense)
         }
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun CategoryCardPreview() {
-//    val previewCategory = Category(
-//        id = 0,
-//        name = "Продукты",
-//        totalExpense = 123.45f,
-//        color = Color.Blue
-//    )
-//    CategoryCard(previewCategory, 15)
-//}
+@Preview(showBackground = true)
+@Composable
+fun CategoryCardPreview() {
+    val previewCategory = Category(
+        id = 0,
+        name = "Продукты",
+        icon = Icons.Outlined.ShoppingCart,
+        color = Color.Blue
+    )
+    CategoryCard(previewCategory, 15, 150.25)
+}
 
 @Composable
-fun CategoryCard(category: CategoryIcon, relativeExpense: Int, modifier: Modifier = Modifier) {
+fun CategoryCard(category: Category, relativeExpense: Int, totalExpense: Double, modifier: Modifier = Modifier) {
     Card (
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
@@ -222,11 +211,21 @@ fun CategoryCard(category: CategoryIcon, relativeExpense: Int, modifier: Modifie
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
-            Icon(
-                imageVector = category.icon,
-                contentDescription = null,
-                tint = category.color
-            )
+            Card (
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(containerColor = category.color)
+            ) {
+                Box (
+                    modifier = Modifier.padding(4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = category.icon,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
             Text(
                 text = category.name,
                 modifier = Modifier
@@ -239,7 +238,7 @@ fun CategoryCard(category: CategoryIcon, relativeExpense: Int, modifier: Modifie
                 textAlign = TextAlign.End
             )
             Text(
-                text = "%.2f ₽".format(category.totalExpense),
+                text = "%.2f ₽".format(totalExpense),
                 modifier = Modifier.weight(0.40f),
                 textAlign = TextAlign.End
             )
@@ -260,7 +259,3 @@ fun CategoryCard(category: CategoryIcon, relativeExpense: Int, modifier: Modifie
 //fun PieInfoPreview() {
 //    PieInfo(categories)
 //}
-
-val categoryNamesList = listOf("Продукты", "Дом", "Здоровье", "Отдых")
-val colorList = listOf(Color(0xFFfed766), Color(0xFFfe4a49), Color(0xFF2ab7ca), SoftGreen)
-val categoryColorMap = categoryNamesList.zip(colorList).toMap()

@@ -2,17 +2,18 @@ package ru.temperantia.screens
 
 import android.icu.text.DateFormat
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -109,7 +110,7 @@ fun TransactionCardPreview() {
         id = null,
         date = Date(),
         account = "Карта",
-        category = "Продукты",
+        categoryId = 0, // TODO this id may crush visualization
         subcategory = null,
         amount = 123.45,
         comment = "Комментарий"
@@ -120,6 +121,7 @@ fun TransactionCardPreview() {
 @Composable
 fun TransactionBlock(transaction: Transaction,
                      modifier: Modifier = Modifier) {
+    val categoryDao = AppDatabase.instance.categoryDao()
     val df = DateFormat.getDateInstance(DateFormat.LONG)
     Text(
         text = df.format(transaction.date),
@@ -137,18 +139,28 @@ fun TransactionBlock(transaction: Transaction,
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier.padding(12.dp)
         ) {
-            Icon(
-                imageVector = Icons.Outlined.ShoppingCart,
-                contentDescription = null,
-                tint = categoryColorMap[transaction.category]!!
-            )
+            Card (
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(containerColor = categoryDao.getById(transaction.categoryId).color) // TODO may be this could be more effective
+            ) {
+                Box (
+                    modifier = Modifier.padding(4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = categoryDao.getById(transaction.categoryId).icon, // TODO may be this could be more effective
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
             Column (
                 modifier = Modifier
                     .weight(0.65f)
                     .padding(start = 12.dp)
             ) {
                 Text(
-                    text = transaction.category,
+                    text = categoryDao.getById(transaction.categoryId).name, // TODO may be this could be more effective
                     fontWeight = FontWeight.SemiBold
                 )
                 if (transaction.comment != null)
