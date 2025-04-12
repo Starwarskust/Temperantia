@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "2.0.21"
     id("com.google.devtools.ksp")
     id("androidx.room")
@@ -42,9 +43,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -72,15 +70,8 @@ dependencies {
 
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
-
-//    implementation(libs.kotlinx.serialization.json)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-
-//     implementation(libs.androidx.work.runtime.ktx)
-    val workVersion = "2.9.0"
-    // val workVersion = "2.10.0"
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
-
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.material.icons.extended)
 
     testImplementation(libs.junit)
