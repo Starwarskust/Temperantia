@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import ru.temperantia.R
 
 @Composable
-fun MenuDrawer() {
+fun MenuDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
     ModalDrawerSheet {
         Column(
             modifier = Modifier.padding(horizontal = 16.dp)

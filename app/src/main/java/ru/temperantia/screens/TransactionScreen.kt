@@ -13,21 +13,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,69 +28,40 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import ru.temperantia.InputNode
 import ru.temperantia.data.AppDatabase
 import ru.temperantia.data.Transaction
-import ru.temperantia.navigation.BottomNavigationBar
-import ru.temperantia.navigation.MenuDrawer
-import ru.temperantia.navigation.TopInfoBar
 import ru.temperantia.ui.theme.yellowButton
 import java.util.Date
 
 @Composable
-fun TransactionScreen(navHostController: NavHostController) {
+fun TransactionScreen(onNavigateToInputScreen: () -> Unit) {
     val transactionDao = AppDatabase.instance.transactionDao()
     val transactionList = transactionDao.getAll()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = { MenuDrawer() },
+    Box (
+        modifier = Modifier.fillMaxSize()
     ) {
-        Scaffold (
-            topBar = {
-                TopInfoBar(scope, drawerState) {
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Search,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
-                }
-            },
-            bottomBar = { BottomNavigationBar(navHostController) },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navHostController.navigate(InputNode) },
-                    containerColor = yellowButton
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null
-                    )
-                }
+        LazyColumn (
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(
+                items = transactionList.sortedByDescending { it.date },
+                key = { item -> item.id!! }
+            ) { transactionItem ->
+                TransactionBlock(transactionItem)
             }
-        ) { innerPadding ->
-            Surface (
-                color = MaterialTheme.colorScheme.surfaceDim,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-            ) {
-                LazyColumn (
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        items = transactionList.sortedByDescending { it.date },
-                        key = { item -> item.id!! }
-                    ) { transactionItem ->
-                        TransactionBlock(transactionItem)
-                    }
-                }
-            }
+        }
+        FloatingActionButton(
+            onClick = onNavigateToInputScreen,
+            containerColor = yellowButton,
+            modifier = Modifier
+                .align(alignment = Alignment.BottomEnd)
+                .padding(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = null
+            )
         }
     }
 }
