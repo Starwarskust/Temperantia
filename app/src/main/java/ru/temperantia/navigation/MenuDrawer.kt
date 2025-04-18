@@ -49,13 +49,19 @@ fun MenuDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                 label = { Text(stringResource(R.string.settings)) },
                 selected = false,
                 icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                onClick = { /* Handle click */ }
+                onClick = {
+                    onItemClick("settings/main")
+                    onClose()
+                }
             )
             NavigationDrawerItem(
                 label = { Text(stringResource(R.string.about)) },
                 selected = false,
                 icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                onClick = { /* Handle click */ },
+                onClick = {
+                    onItemClick("about/main")
+                    onClose()
+                },
             )
             Spacer(Modifier.height(12.dp))
         }

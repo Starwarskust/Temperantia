@@ -40,11 +40,13 @@ import ru.temperantia.navigation.MenuDrawer
 import ru.temperantia.navigation.OverviewTopBar
 import ru.temperantia.navigation.SimpleTopBar
 import ru.temperantia.navigation.TransactionTopBar
+import ru.temperantia.screens.AboutScreen
 import ru.temperantia.screens.AccountScreen
 import ru.temperantia.screens.CategoryEditScreen
 import ru.temperantia.screens.CategoryScreen
 import ru.temperantia.screens.InputScreen
 import ru.temperantia.screens.OverviewScreen
+import ru.temperantia.screens.SettingScreen
 import ru.temperantia.screens.TransactionScreen
 import ru.temperantia.ui.theme.TemperantiaTheme
 
@@ -129,6 +131,8 @@ fun TemperantiaApp() {
                     categoryTab(navController)
                     transactionTab(navController)
                     overviewTab(navController)
+                    settingsGraph(navController)
+                    aboutGraph(navController)
                 }
             }
         }
@@ -191,6 +195,28 @@ fun NavGraphBuilder.overviewTab(navController: NavHostController) {
     }
 }
 
+fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
+    navigation(
+        startDestination = "settings/main",
+        route = "settings"
+    ) {
+        composable("settings/main") {
+            SettingScreen()
+        }
+    }
+}
+
+fun NavGraphBuilder.aboutGraph(navController: NavHostController) {
+    navigation(
+        startDestination = "about/main",
+        route = "about"
+    ) {
+        composable("about/main") {
+            AboutScreen()
+        }
+    }
+}
+
 sealed class MainTab(
     val route: String,
     val title: String,
@@ -247,6 +273,15 @@ fun DynamicTopBar(navController: NavHostController, onMenuClick: () -> Unit) {
         )
         "transaction/input" -> SimpleTopBar(
             title = stringResource(R.string.add_transaction),
+            onBack = { navController.popBackStack() }
+        )
+
+        "settings/main" -> SimpleTopBar(
+            title = stringResource(R.string.settings),
+            onBack = { navController.popBackStack() }
+        )
+        "about/main" -> SimpleTopBar(
+            title = stringResource(R.string.about),
             onBack = { navController.popBackStack() }
         )
     }
