@@ -17,4 +17,15 @@
     <string name="overview">Обзор</string>
     <string name="settings">Настройки</string>
     <string name="transactions">Операции</string>
+    <string name="savings">Сбережения</string>
+    <string name="default_category_groceries">Продукты</string>
+    <string name="default_category_cafe">Кафе</string>
+    <string name="default_category_home">Дом</string>
+    <string name="default_category_transport">Транспорт</string>
+    <string name="default_category_health">Здоровье</string>
+    <string name="default_category_sport">Спорт</string>
+    <string name="default_category_leisure">Досуг</string>
+    <string name="default_category_presents">Подарки</string>
+    <string name="default_account_card">Карта</string>
+    <string name="default_account_cash">Наличные</string>
 </resources>

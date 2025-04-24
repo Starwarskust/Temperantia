@@ -21,7 +21,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,14 +50,11 @@ import java.util.Date
 fun InputScreen(onAddTransaction: () -> Unit) {
     val transactionDao = AppDatabase.instance.transactionDao()
     var inputValue by remember { mutableStateOf("0") }
+    var inputAccount by remember { mutableStateOf<Int?>(0) }
     var inputCategory by remember { mutableStateOf<Int?>(null) }
     var inputDate by remember { mutableStateOf(Date()) }
     var inputComment by remember { mutableStateOf<String?>(null) }
-    val transactionList = transactionDao.getAll()
-    var n by remember { mutableIntStateOf(transactionList.size) }
-
-//    TODO get lastTransactionDate from database
-    val lastTransactionDate = Date(2024 - 1900, 11, 15)
+    val latestExpenseDate = transactionDao.getLatestExpenseDate()
 
     Box (
         modifier = Modifier.fillMaxSize()
@@ -78,7 +73,7 @@ fun InputScreen(onAddTransaction: () -> Unit) {
             CategorySelectionPanel {
                 inputCategory = it
             }
-            DateSelectionPanel(lastTransactionDate) {
+            DateSelectionPanel(latestExpenseDate) {
                 inputDate = it
             }
             OutlinedTextField(
@@ -87,32 +82,6 @@ fun InputScreen(onAddTransaction: () -> Unit) {
                 label = { Text("Комментарий") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
-
-            // TODO remove TEMPORAL BUTTONS
-            OutlinedButton(
-                onClick = {
-                    transactionDao.insertAll(transactionPresetScope)
-                    n += transactionPresetScope.size
-                }
-            ) {
-                Text("Push ${transactionPresetScope.size} transactions")
-            }
-            OutlinedButton(
-                onClick = {
-                    transactionDao.deleteAll()
-                    n = 0
-                }
-            ) {
-                Text("Clean database")
-            }
-            Text("Now DB has $n records")
-            val datePicked = DateFormat.getPatternInstance(DateFormat.NUM_MONTH_DAY).format(inputDate)
-            Text(
-                text = "Date: $datePicked",
-                fontWeight = FontWeight.SemiBold
-            )
-            // TEMPORAL BUTTONS
-
         }
         ExtendedFloatingActionButton(
             onClick = {
@@ -121,7 +90,7 @@ fun InputScreen(onAddTransaction: () -> Unit) {
                     val inputTransaction = Transaction(
                         id = null,
                         date = inputDate,
-                        account = "Карта",
+                        accountId = inputAccount!!,
                         categoryId = inputCategory!!,
                         subcategory = null,
                         amount = inputValue.toDouble(),
@@ -173,7 +142,7 @@ fun CategorySelectionPanel(onCategorySelected: (Int) -> Unit) {
 
 // TODO fix UI response
 @Composable
-fun DateSelectionPanel(lastTransactionDate: Date, onDateSelected: (Date) -> Unit) {
+fun DateSelectionPanel(latestExpenseDate: Date, onDateSelected: (Date) -> Unit) {
     val df = DateFormat.getPatternInstance(DateFormat.NUM_MONTH_DAY)
 
     val calendar = Calendar.getInstance()
@@ -181,7 +150,7 @@ fun DateSelectionPanel(lastTransactionDate: Date, onDateSelected: (Date) -> Unit
     calendar.add(Calendar.DAY_OF_MONTH, -1)
     val yesterday = calendar.time
 
-    var thirdChipDate by remember { mutableStateOf(lastTransactionDate) }
+    var thirdChipDate by remember { mutableStateOf(latestExpenseDate) }
     var thirdChipText by remember { mutableStateOf(MyApplication.appContext.getString(R.string.date_last)) }
 
     var selectedDate by remember { mutableStateOf(Date()) }
@@ -327,12 +296,3 @@ fun DatePickerModal(
         DatePicker(state = datePickerState)
     }
 }
-
-// TODO this transactionPresetScope may crush app due to categoryId
-val transactionPresetScope = listOf(
-    Transaction(null, Date(2024 - 1900, 11, 15), "Карта", 4, "Подкатегория", 124.67, "Пятерочка"),
-    Transaction(null, Date(2024 - 1900, 11, 16), "Карта", 1,      "Подкатегория", 345.17, null),
-    Transaction(null, Date(2024 - 1900, 11, 16), "Карта", 4, "Подкатегория", 1023.0,   "Перекресток"),
-    Transaction(null, Date(2024 - 1900, 11, 18), "Карта", 2, null,           350.10, "Горздрав"),
-    Transaction(null, Date(2024 - 1900, 11, 19), "Карта", 3,    "Подкатегория", 345.17, null)
-)

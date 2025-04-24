@@ -72,8 +72,8 @@ fun TransactionCardPreview() {
     val previewTransaction = Transaction(
         id = null,
         date = Date(),
-        account = "Карта",
-        categoryId = 0, // TODO this id may crush visualization
+        accountId = 0,
+        categoryId = 0,
         subcategory = null,
         amount = 123.45,
         comment = "Комментарий"

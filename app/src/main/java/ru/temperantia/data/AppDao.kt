@@ -5,11 +5,15 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import java.util.Date
 
 @Dao
 interface TransactionDao {
     @Query("SELECT * FROM transactions")
     fun getAll(): List<Transaction>
+
+    @Query("SELECT MAX(date) FROM transactions")
+    fun getLatestExpenseDate(): Date
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(transaction: Transaction)
@@ -48,5 +52,26 @@ interface CategoryDao {
     fun delete(category: Category)
 
     @Query("DELETE FROM categories")
+    fun deleteAll()
+}
+
+@Dao
+interface AccountDao {
+    @Query("SELECT * FROM accounts")
+    fun getAll(): List<Account>
+
+    @Query("SELECT * FROM accounts WHERE id = :id")
+    fun getById(id: Int): Account
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(account: Account)
+
+    @Insert
+    fun insertAll(accounts: List<Account>)
+
+    @Delete
+    fun delete(account: Account)
+
+    @Query("DELETE FROM accounts")
     fun deleteAll()
 }

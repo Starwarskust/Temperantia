@@ -15,7 +15,8 @@ data class Transaction(
     @PrimaryKey(autoGenerate = true)
     val id: Int?,
     val date: Date,
-    val account: String,
+    @ColumnInfo(name = "account_id")
+    val accountId: Int,
     @ColumnInfo(name = "category_id")
     val categoryId: Int,
     val subcategory: String?,
@@ -36,8 +37,12 @@ data class Category(
 data class Account(
     @PrimaryKey(autoGenerate = true)
     val id: Int?,
+    val group: String,
     val name: String,
-    val balance: Double
+    val icon: ImageVector,
+    val color: Color,
+    @ColumnInfo(name = "ignore_in_balance")
+    val ignoreInBalance: Boolean
 )
 
 class Converters {
