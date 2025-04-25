@@ -8,13 +8,15 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import java.util.Date
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @Entity(tableName = "transactions")
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
     val id: Int?,
-    val date: Date,
+    val date: LocalDateTime,
     @ColumnInfo(name = "account_id")
     val accountId: Int,
     @ColumnInfo(name = "category_id")
@@ -47,13 +49,13 @@ data class Account(
 
 class Converters {
     @TypeConverter
-    fun fromTimestamp(value: Long): Date {
-        return Date(value)
+    fun fromTimestamp(value: Long): LocalDateTime {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneId.systemDefault())
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date): Long {
-        return date.time
+    fun dateToTimestamp(date: LocalDateTime): Long {
+        return date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 
     @TypeConverter

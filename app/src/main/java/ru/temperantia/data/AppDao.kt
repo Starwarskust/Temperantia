@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import java.util.Date
+import java.time.LocalDateTime
 
 @Dao
 interface TransactionDao {
@@ -13,7 +13,7 @@ interface TransactionDao {
     fun getAll(): List<Transaction>
 
     @Query("SELECT MAX(date) FROM transactions")
-    fun getLatestExpenseDate(): Date
+    fun getLatestExpenseDate(): LocalDateTime
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(transaction: Transaction)

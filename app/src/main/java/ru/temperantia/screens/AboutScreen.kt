@@ -10,17 +10,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import ru.temperantia.data.AppDatabase
 import ru.temperantia.data.Transaction
-import java.util.Date
+import java.time.LocalDateTime
+import kotlin.math.round
+import kotlin.random.Random
 
 @Composable
 fun AboutScreen() {
-    val transactionPresetScope = listOf(
-        Transaction(null, Date(2024 - 1900, 11, 15), 0, 4, "Подкатегория", 124.67, "Пятерочка"),
-        Transaction(null, Date(2024 - 1900, 11, 16), 0, 1, "Подкатегория", 345.17, null),
-        Transaction(null, Date(2024 - 1900, 11, 16), 0, 4, "Подкатегория", 1023.0,   "Перекресток"),
-        Transaction(null, Date(2024 - 1900, 11, 18), 0, 2, null,           350.10, "Горздрав"),
-        Transaction(null, Date(2024 - 1900, 11, 19), 0, 3, "Подкатегория", 345.17, null)
-    )
+    val today = LocalDateTime.now()
+    val randSecs = List(10) { Random.nextLong(5 * 86400, 35 * 86400) }.sorted()
+    val transactionPresetScope = List(10) { it ->
+        Transaction(null, today.minusSeconds(randSecs[it]), 0, Random.nextInt(1, 9), null,
+            round(Random.nextDouble(100.0, 1500.0) * 100) / 100, "Comment")
+    }
     Column {
         Text("AboutScreen")
 

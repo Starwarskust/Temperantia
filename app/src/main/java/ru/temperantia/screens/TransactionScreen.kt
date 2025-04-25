@@ -1,6 +1,5 @@
 package ru.temperantia.screens
 
-import android.icu.text.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +30,8 @@ import androidx.compose.ui.unit.sp
 import ru.temperantia.data.AppDatabase
 import ru.temperantia.data.Transaction
 import ru.temperantia.ui.theme.yellowButton
-import java.util.Date
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TransactionScreen(onNavigateToInputScreen: () -> Unit) {
@@ -71,12 +71,12 @@ fun TransactionScreen(onNavigateToInputScreen: () -> Unit) {
 fun TransactionCardPreview() {
     val previewTransaction = Transaction(
         id = null,
-        date = Date(),
+        date = LocalDateTime.now(),
         accountId = 0,
         categoryId = 0,
         subcategory = null,
         amount = 123.45,
-        comment = "Комментарий"
+        comment = "Comment"
     )
     TransactionBlock(previewTransaction)
 }
@@ -85,7 +85,7 @@ fun TransactionCardPreview() {
 fun TransactionBlock(transaction: Transaction,
                      modifier: Modifier = Modifier) {
     val categoryDao = AppDatabase.instance.categoryDao()
-    val df = DateFormat.getDateInstance(DateFormat.LONG)
+    val df = DateTimeFormatter.ofPattern("dd MMMM yyyy г.")
     Text(
         text = df.format(transaction.date),
         fontWeight = FontWeight.SemiBold

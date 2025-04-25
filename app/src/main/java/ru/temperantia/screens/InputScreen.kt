@@ -1,7 +1,5 @@
 package ru.temperantia.screens
 
-import android.icu.text.DateFormat
-import android.icu.util.Calendar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +41,10 @@ import ru.temperantia.data.AppDatabase
 import ru.temperantia.data.Transaction
 import ru.temperantia.ui.theme.SoftGreen
 import ru.temperantia.ui.theme.yellowButton
-import java.util.Date
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +53,7 @@ fun InputScreen(onAddTransaction: () -> Unit) {
     var inputValue by remember { mutableStateOf("0") }
     var inputAccount by remember { mutableStateOf<Int?>(0) }
     var inputCategory by remember { mutableStateOf<Int?>(null) }
-    var inputDate by remember { mutableStateOf(Date()) }
+    var inputDate by remember { mutableStateOf(LocalDateTime.now()) }
     var inputComment by remember { mutableStateOf<String?>(null) }
     val latestExpenseDate = transactionDao.getLatestExpenseDate()
 
@@ -142,18 +143,15 @@ fun CategorySelectionPanel(onCategorySelected: (Int) -> Unit) {
 
 // TODO fix UI response
 @Composable
-fun DateSelectionPanel(latestExpenseDate: Date, onDateSelected: (Date) -> Unit) {
-    val df = DateFormat.getPatternInstance(DateFormat.NUM_MONTH_DAY)
-
-    val calendar = Calendar.getInstance()
-    val today = calendar.time
-    calendar.add(Calendar.DAY_OF_MONTH, -1)
-    val yesterday = calendar.time
+fun DateSelectionPanel(latestExpenseDate: LocalDateTime, onDateSelected: (LocalDateTime) -> Unit) {
+    val df = DateTimeFormatter.ofPattern("dd.MM")
+    val today = LocalDateTime.now()
+    val yesterday = today.minusDays(1)
 
     var thirdChipDate by remember { mutableStateOf(latestExpenseDate) }
     var thirdChipText by remember { mutableStateOf(MyApplication.appContext.getString(R.string.date_last)) }
 
-    var selectedDate by remember { mutableStateOf(Date()) }
+    var selectedDate by remember { mutableStateOf(LocalDateTime.now()) }
 
     var todayIsSelected by remember { mutableStateOf(true) }
     var yesterdayIsSelected by remember { mutableStateOf(false) }
@@ -237,12 +235,12 @@ fun DateSelectionPanel(latestExpenseDate: Date, onDateSelected: (Date) -> Unit) 
             DatePickerModal(
                 onDateSelected = {
                     if (it != null) {
-                        selectedDate = Date(it)
+                        selectedDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
                         onDateSelected(selectedDate)
                         showModal = false
                         calendarWasOpened = true
                         when {
-                            selectedDate.before(yesterday) -> {
+                            selectedDate.isBefore(yesterday) -> {
                                 todayIsSelected = false
                                 yesterdayIsSelected = false
                                 thirdChipIsSelected = true
